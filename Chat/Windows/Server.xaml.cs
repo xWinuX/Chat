@@ -9,7 +9,7 @@ using Chat.Utility;
 
 namespace Chat.Windows
 {
-    public partial class Server : IConsole
+    public partial class Server
     {
         public Server() { InitializeComponent(); }
 
@@ -18,56 +18,62 @@ namespace Chat.Windows
             base.OnInitialized(e);
 
             BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += (sender, _) =>
+            worker.WorkerReportsProgress =  true;
+            worker.DoWork                += StartTcpServer;
+
+            worker.ProgressChanged += OnTCPServerProgressChanged;
+
+            worker.RunWorkerAsync();
+        }
+
+        private static void StartTcpServer(object sender, DoWorkEventArgs _)
+        {
+            void OpenServer()
             {
                 try
                 {
                     BackgroundWorker backgroundWorker = (BackgroundWorker)sender;
                     TcpServer        server           = new TcpServer(backgroundWorker);
-                
+
                     server.Run();
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
-                    // ignored
+                    BackgroundWorker backgroundWorker = (BackgroundWorker)sender;
+                    LogUtility.LogError(backgroundWorker, "TCP Server crashed, restarting...");
+                    OpenServer();
                 }
-            };
-            worker.ProgressChanged += (sender, args) =>
+            }
+
+            OpenServer();
+        }
+
+        private void OnTCPServerProgressChanged(object sender, ProgressChangedEventArgs args)
+        {
+            if (args.UserState == null) { return; }
+
+            LoggingBackgroundWorkerProgressData loggingBackgroundWorkerProgressData = (LoggingBackgroundWorkerProgressData)args.UserState;
+
+            switch (loggingBackgroundWorkerProgressData.LogState)
             {
-                if (args.UserState == null) { return; }
-
-                LoggingBackgroundWorkerProgressData loggingBackgroundWorkerProgressData = (LoggingBackgroundWorkerProgressData)args.UserState;
-
-                switch (loggingBackgroundWorkerProgressData.LogState)
-                {
-                    case LogState.Normal:  
-                        Log(loggingBackgroundWorkerProgressData.Message);
-                        break;
-                    case LogState.Success: 
-                        LogSuccess(loggingBackgroundWorkerProgressData.Message);
-                        break;
-                    case LogState.Warning: 
-                        LogWarning(loggingBackgroundWorkerProgressData.Message);
-                        break;
-                    case LogState.Error:  
-                        LogError(loggingBackgroundWorkerProgressData.Message);
-                        break;
-                }
-            }; 
-            
-            worker.RunWorkerAsync();
+                case LogState.Normal:
+                    Log(loggingBackgroundWorkerProgressData.Message);
+                    break;
+                case LogState.Success:
+                    LogSuccess(loggingBackgroundWorkerProgressData.Message);
+                    break;
+                case LogState.Warning:
+                    LogWarning(loggingBackgroundWorkerProgressData.Message);
+                    break;
+                case LogState.Error:
+                    LogError(loggingBackgroundWorkerProgressData.Message);
+                    break;
+            }
         }
 
         private ServerConsoleEntryBuilder _builder => new ServerConsoleEntryBuilder();
 
-        private void BtnCloseServer_OnClick(object sender, RoutedEventArgs e)
-        {
-            Log("Default");
-            LogSuccess("Success");
-            LogWarning("Warning");
-            LogError("Error");
-        }
+        private void BtnCloseServer_OnClick(object sender, RoutedEventArgs e) { }
 
         private static void AddTimeToTextBlock(TextBlock textBlock)
         {
