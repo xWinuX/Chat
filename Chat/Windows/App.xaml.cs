@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Chat
+namespace Chat.Windows
 {
     public partial class App : Application
     {

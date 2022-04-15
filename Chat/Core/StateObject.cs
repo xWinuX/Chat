@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-namespace Chat
+namespace Chat.Core
 {
     
     public class StateObject

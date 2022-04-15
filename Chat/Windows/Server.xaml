@@ -1,0 +1,20 @@
+﻿<Window x:Class="Chat.Windows.Server"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Server" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition MaxHeight="40" />
+        </Grid.RowDefinitions>
+        
+        <ScrollViewer Name="ScrollViewer" Grid.Row="0" Margin="5" BorderThickness="5" Background="Black">
+            <StackPanel Name="Console" />
+        </ScrollViewer>
+
+        <Button Name="BtnCloseServer" Grid.Row="1" Margin="5" Click="BtnCloseServer_OnClick">Close Server</Button>
+    </Grid>
+</Window>

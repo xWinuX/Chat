@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Chat.Utility;
 
-namespace Chat
+namespace Chat.Core
 {
     public class TcpServer
     {
@@ -13,8 +15,11 @@ namespace Chat
         private readonly List<string> _chatLog = new List<string>();
 
         private readonly ManualResetEvent _allDone = new ManualResetEvent(false);
+        private readonly BackgroundWorker _backgroundWorker;
 
         private Socket _listener;
+
+        public TcpServer(BackgroundWorker backgroundWorker) { _backgroundWorker = backgroundWorker; }
 
         public void Run()
         {
@@ -31,7 +36,7 @@ namespace Chat
                 {
                     _allDone.Reset();
 
-                    Console.WriteLine("Waiting for connection");
+                    LogUtility.Log(_backgroundWorker, "Waiting for connection");
                     _listener.BeginAccept(AcceptCallback, _listener);
 
                     _allDone.WaitOne();
@@ -39,7 +44,7 @@ namespace Chat
             }
             catch (Exception e)
             {
-                Console.WriteLine("SocketException : " + e);
+                LogUtility.LogError(_backgroundWorker, "SocketException : " + e);
                 throw;
             }
         }
@@ -56,7 +61,7 @@ namespace Chat
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
             }
-            catch (Exception) { Console.WriteLine("Failed to close the clients handler!"); }
+            catch (Exception) { LogUtility.LogWarning(_backgroundWorker, "Failed to close the clients handler!"); }
         }
 
         private void AcceptCallback(IAsyncResult asyncResult)
@@ -92,12 +97,12 @@ namespace Chat
                 string content = state?.Sb.ToString();
                 _chatLog.Add(content);
 
-                Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content?.Length, content);
+                LogUtility.Log(_backgroundWorker, $"Read {content?.Length} bytes from socket. \n Data : {content}");
                 foreach (Socket client in _clients) { Send(client, content); }
             }
             catch (Exception)
             {
-                Console.WriteLine("Client forcefully disconnected");
+                LogUtility.LogWarning(_backgroundWorker, "Client forcefully disconnected");
                 CloseHandler(handler);
             }
         }
@@ -124,12 +129,12 @@ namespace Chat
                 if (handler != null)
                 {
                     int bytesSent = handler.EndSend(asyncResult);
-                    Console.WriteLine("Sent {0} bytes to client.", bytesSent);
+                    LogUtility.Log(_backgroundWorker, $"Sent {bytesSent} bytes to client.");
                 }
 
                 BeginReceive(handler, state);
             }
-            catch (Exception e) { Console.WriteLine("SendCallbackException: " + e); }
+            catch (Exception e) { LogUtility.Log(_backgroundWorker, "SendCallbackException: " + e); }
         }
     }
 }
