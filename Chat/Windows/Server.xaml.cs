@@ -1,15 +1,13 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Chat.Core;
-using Chat.Logging;
 using Chat.Utility;
 
 namespace Chat.Windows
 {
-    public partial class Server
+    public partial class Server : IConsole
     {
         public Server() { InitializeComponent(); }
 
@@ -17,30 +15,21 @@ namespace Chat.Windows
         {
             base.OnInitialized(e);
 
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress =  true;
-            worker.DoWork                += StartTcpServer;
-
-            worker.ProgressChanged += OnTCPServerProgressChanged;
-
-            worker.RunWorkerAsync();
+            StartTcpServer();
         }
 
-        private static void StartTcpServer(object sender, DoWorkEventArgs _)
+        private void StartTcpServer()
         {
             void OpenServer()
             {
                 try
                 {
-                    BackgroundWorker backgroundWorker = (BackgroundWorker)sender;
-                    TcpServer        server           = new TcpServer(backgroundWorker);
-
+                    TcpServer server = new TcpServer(this);
                     server.Run();
                 }
                 catch (Exception)
                 {
-                    BackgroundWorker backgroundWorker = (BackgroundWorker)sender;
-                    LogUtility.LogError(backgroundWorker, "TCP Server crashed, restarting...");
+                    LogError("TCP Server crashed, restarting...");
                     OpenServer();
                 }
             }
@@ -48,30 +37,7 @@ namespace Chat.Windows
             OpenServer();
         }
 
-        private void OnTCPServerProgressChanged(object sender, ProgressChangedEventArgs args)
-        {
-            if (args.UserState == null) { return; }
-
-            LoggingBackgroundWorkerProgressData loggingBackgroundWorkerProgressData = (LoggingBackgroundWorkerProgressData)args.UserState;
-
-            switch (loggingBackgroundWorkerProgressData.LogState)
-            {
-                case LogState.Normal:
-                    Log(loggingBackgroundWorkerProgressData.Message);
-                    break;
-                case LogState.Success:
-                    LogSuccess(loggingBackgroundWorkerProgressData.Message);
-                    break;
-                case LogState.Warning:
-                    LogWarning(loggingBackgroundWorkerProgressData.Message);
-                    break;
-                case LogState.Error:
-                    LogError(loggingBackgroundWorkerProgressData.Message);
-                    break;
-            }
-        }
-
-        private ServerConsoleEntryBuilder _builder => new ServerConsoleEntryBuilder();
+        private TextBlockBuilder _builder => new TextBlockBuilder();
 
         private void BtnCloseServer_OnClick(object sender, RoutedEventArgs e) { }
 
@@ -84,8 +50,7 @@ namespace Chat.Windows
         private void AppendToConsole(TextBlock textBlock)
         {
             AddTimeToTextBlock(textBlock);
-            Console.Children.Add(textBlock);
-            ScrollViewer.ScrollToBottom();
+            ScrtConsole.AddText(textBlock);
         }
 
         public void Log(string message) { AppendToConsole(_builder.WithMessage(message).Build()); }

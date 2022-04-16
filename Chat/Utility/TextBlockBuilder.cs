@@ -4,18 +4,18 @@ using System.Windows.Media;
 
 namespace Chat.Utility
 {
-    public class ServerConsoleEntryBuilder
+    public class TextBlockBuilder
     {
         private string _message = string.Empty;
         private Brush  _color   = new SolidColorBrush(Colors.White);
         
-        public ServerConsoleEntryBuilder WithColor(Color color)
+        public TextBlockBuilder WithColor(Color color)
         {
             _color = new SolidColorBrush(color);
             return this;
         }
 
-        public ServerConsoleEntryBuilder WithMessage(string message)
+        public TextBlockBuilder WithMessage(string message)
         {
             _message = message;
             return this;

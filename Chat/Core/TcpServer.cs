@@ -1,25 +1,25 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using Chat.Utility;
+using System.Threading.Tasks;
 
 namespace Chat.Core
 {
     public class TcpServer
     {
         private readonly List<Socket> _clients = new List<Socket>();
-        private readonly List<string> _chatLog = new List<string>();
 
-        private readonly ManualResetEvent _allDone = new ManualResetEvent(false);
-        private readonly BackgroundWorker _backgroundWorker;
+        private readonly IConsole         _console;
 
         private Socket _listener;
 
-        public TcpServer(BackgroundWorker backgroundWorker) { _backgroundWorker = backgroundWorker; }
+        public TcpServer(IConsole console)
+        {
+            _console = console;
+        }
 
         public void Run()
         {
@@ -32,25 +32,53 @@ namespace Chat.Core
                 _listener.Bind(localEndPoint);
                 _listener.Listen(100);
 
-                while (true)
-                {
-                    _allDone.Reset();
-
-                    LogUtility.Log(_backgroundWorker, "Waiting for connection");
-                    _listener.BeginAccept(AcceptCallback, _listener);
-
-                    _allDone.WaitOne();
-                }
+                _console.LogSuccess( "Server Successfully started");
+                _console.Log( "Waiting for connection");
+                
+                AcceptHandler();
             }
             catch (Exception e)
             {
-                LogUtility.LogError(_backgroundWorker, "SocketException : " + e);
+                _console.LogError( "SocketException : " + e);
                 throw;
             }
         }
 
-        private void BeginReceive(Socket handler, StateObject state) { handler?.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, ReadCallback, state); }
+        private async Task AcceptHandler()
+        {
+            while (true)
+            {
+                Socket client = await _listener.AcceptAsync();
+                _console.LogSuccess("New client connected!");
+                _clients.Add(client);
+                ReceiveHandler(client);
+            }
+        }
 
+        private async Task ReceiveHandler(Socket client)
+        {
+            while (true)
+            {
+                try
+                {
+                    Packet             packet       = new Packet();
+                    ArraySegment<byte> arraySegment = new ArraySegment<byte>(packet.Buffer, 0, Packet.BufferSize);
+                    int                numBytesRead = await client.ReceiveAsync(arraySegment, SocketFlags.None);
+                    byte[]             data         = arraySegment.ToArray();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(Encoding.Default.GetString(data, 1, numBytesRead - 1));
+                    _console.Log( sb.ToString());
+                    await UpdateAllClients(client, data);
+                }
+                catch (Exception)
+                {
+                    _console.LogWarning( "Client has forcefully disconnected!");
+                    CloseHandler(client);
+                }
+            }
+        }
+        
         private void CloseHandler(Socket handler)
         {
             if (handler == null) { return; }
@@ -61,80 +89,20 @@ namespace Chat.Core
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
             }
-            catch (Exception) { LogUtility.LogWarning(_backgroundWorker, "Failed to close the clients handler!"); }
+            catch (Exception) { _console.LogWarning( "Failed to close the clients handler!"); }
         }
-
-        private void AcceptCallback(IAsyncResult asyncResult)
+        
+        private async Task UpdateAllClients(Socket handler, byte[] bytes)
         {
-            _allDone.Set();
-
-            Socket      listener = (Socket)asyncResult.AsyncState;
-            Socket      handler  = listener?.EndAccept(asyncResult);
-            StateObject state    = new StateObject { WorkSocket = handler };
-
-            _clients.Add(handler);
-
-            Send(handler, _chatLog);
-            BeginReceive(handler, state);
-        }
-
-        private void ReadCallback(IAsyncResult asyncResult)
-        {
-            StateObject state   = (StateObject)asyncResult.AsyncState;
-            Socket      handler = state?.WorkSocket;
-
-            try
+            foreach (Socket client in _clients.Where(client => !client.Equals(handler)))
             {
-                if (handler != null)
-                {
-                    int bytesRead = handler.EndReceive(asyncResult);
-
-                    if (bytesRead <= 0) { return; }
-
-                    state.Sb.Append(Encoding.Default.GetString(state.Buffer, 0, bytesRead));
-                }
-
-                string content = state?.Sb.ToString();
-                _chatLog.Add(content);
-
-                LogUtility.Log(_backgroundWorker, $"Read {content?.Length} bytes from socket. \n Data : {content}");
-                foreach (Socket client in _clients) { Send(client, content); }
-            }
-            catch (Exception)
-            {
-                LogUtility.LogWarning(_backgroundWorker, "Client forcefully disconnected");
-                CloseHandler(handler);
+                await Send(client, bytes);
             }
         }
 
-        private void Send(Socket handler, List<string> data)
+        private async Task Send(Socket client, byte[] bytes)
         {
-            foreach (string s in data) { Send(handler, s); }
-        }
-
-        private void Send(Socket handler, string data)
-        {
-            byte[] byteData = Encoding.Default.GetBytes(data);
-
-            handler.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, handler);
-        }
-
-        private void SendCallback(IAsyncResult asyncResult)
-        {
-            try
-            {
-                Socket      handler = (Socket)asyncResult.AsyncState;
-                StateObject state   = new StateObject { WorkSocket = handler };
-
-                if (handler != null)
-                {
-                    int bytesSent = handler.EndSend(asyncResult);
-                    LogUtility.Log(_backgroundWorker, $"Sent {bytesSent} bytes to client.");
-                }
-
-                BeginReceive(handler, state);
-            }
-            catch (Exception e) { LogUtility.Log(_backgroundWorker, "SendCallbackException: " + e); }
+            await client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None);
         }
     }
 }

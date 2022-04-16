@@ -17,6 +17,6 @@
         <TextBox Grid.Row="1" Margin="5" TextAlignment="Center" />
         <Label Grid.Row="2" Margin="0 2 0 0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Username</Label>
         <TextBox Grid.Row="3" Margin="5" TextAlignment="Center" />
-        <Button Grid.Row="4" Margin="5 30 5 0 ">Login</Button>
+        <Button Grid.Row="4" Name="BtnLogin" Margin="5 30 5 0" Click="BtnLogin_OnClick">Login</Button>
     </Grid>
 </Window>
