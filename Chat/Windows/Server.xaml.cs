@@ -2,8 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Chat.Core;
 using Chat.Utility;
+using ChatNetworking.Core;
+using Networking;
 
 namespace Chat.Windows
 {
@@ -24,7 +25,7 @@ namespace Chat.Windows
             {
                 try
                 {
-                    TcpServer server = new TcpServer(this);
+                    ChatTcpServer server = new ChatTcpServer(this);
                     server.Run();
                 }
                 catch (Exception)

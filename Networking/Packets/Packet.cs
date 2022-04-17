@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text;
-using Chat.Core;
 
-namespace Chat.Packets
+namespace Networking.Packets
 {
     public abstract class Packet
     {
@@ -16,7 +15,7 @@ namespace Chat.Packets
         public static PacketType GetType(byte[] bytes)
         {
             try { return (PacketType)Enum.Parse(typeof(PacketType), bytes[0].ToString()); }
-            catch (Exception e) { return PacketType.Invalid; }
+            catch (Exception) { return PacketType.Invalid; }
         }
 
         public static T TryParse<T>(byte[] bytes, int bytesSent = BufferSize) where T : Packet

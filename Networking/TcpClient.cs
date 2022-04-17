@@ -1,31 +1,26 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Chat.Packets;
-using Chat.Windows;
+using Networking.Packets;
 
-namespace Chat.Core
+namespace Networking
 {
     public class TcpClient
     {
-        public TcpClient(string address, int port, string userName, IChat chat)
+        public TcpClient(string address, int port, string userName)
         {
             _address  = address;
             _port     = port;
             _userName = userName;
-            _chat     = chat;
         }
 
         private readonly string _userName;
         private readonly string _address;
         private readonly int    _port;
-        private readonly IChat  _chat;
 
         private Socket _client;
-
-        private bool _socketIsSending;
-        private bool _socketIsReceiving;
 
         public async Task Start()
         {
@@ -60,31 +55,16 @@ namespace Chat.Core
                     ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
                     int                numBytesRead = await client.ReceiveAsync(arraySegment, 0);
                     byte[]             data         = arraySegment.ToArray();
-
-                    PacketType packetType = Packet.GetType(data);
-
-                    if (packetType != PacketType.Invalid)
-                    {
-                        switch (packetType)
-                        {
-                            case PacketType.ClientConnected:
-                                ClientConnectedPacket clientConnectedPacket = Packet.TryParse<ClientConnectedPacket>(data, numBytesRead);
-                                _chat.AddServerMessage($"{clientConnectedPacket.UserName} has joined the Server!");
-                                break;
-                            case PacketType.ClientMessageSent:
-                                ClientMessageSentPacket clientMessageSentPacketPacket = Packet.TryParse<ClientMessageSentPacket>(data, numBytesRead);
-                                _chat.AddMessage(clientMessageSentPacketPacket.UserName, clientMessageSentPacketPacket.Message);
-                                break;
-                        }
-                    }
+                    
+                    ResolvePacket(data, numBytesRead);
                 }
             }
             catch (Exception e) { Console.WriteLine(e.ToString()); }
         }
 
-        public async Task SendMessage(string userName, string message) { await Send(new ClientMessageSentPacket(userName, message)); }
+        protected virtual void ResolvePacket(byte[] data, int numBytesRead) { }
 
-        private async Task Send(Packet packet)
+        protected async Task Send(Packet packet)
         {
             if (_client == null) { return; }
             

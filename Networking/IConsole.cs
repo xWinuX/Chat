@@ -1,4 +1,4 @@
-namespace Chat.Core
+namespace Networking
 {
     public interface IConsole
     {

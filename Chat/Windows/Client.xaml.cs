@@ -2,15 +2,16 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Chat.Core;
 using Chat.Utility;
+using ChatNetworking.Core;
+using Networking;
 
 namespace Chat.Windows
 {
     public partial class Client : IChat
     {
         private readonly string    _userName;
-        private readonly TcpClient _client;
+        private readonly ChatTcpClient _client;
 
         public Client(string userName)
         {
@@ -20,7 +21,7 @@ namespace Chat.Windows
 
             try
             {
-                _client = new TcpClient("127.0.0.1", 11000, _userName, this);
+                _client = new ChatTcpClient("127.0.0.1", 11000, _userName, this);
                 _client.Start();
             }
             catch (Exception e)

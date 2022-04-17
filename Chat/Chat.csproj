@@ -13,4 +13,9 @@
       </ApplicationDefinition>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ChatNetworking\ChatNetworking.csproj" />
+      <ProjectReference Include="..\Networking\Networking.csproj" />
+    </ItemGroup>
+
 </Project>

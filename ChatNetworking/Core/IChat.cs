@@ -1,4 +1,4 @@
-﻿namespace Chat.Windows
+﻿namespace ChatNetworking.Core
 {
     public interface IChat
     {

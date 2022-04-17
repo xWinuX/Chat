@@ -1,4 +1,4 @@
-﻿namespace Chat.Packets
+﻿namespace Networking.Packets
 {
     public enum PacketType : byte
     {

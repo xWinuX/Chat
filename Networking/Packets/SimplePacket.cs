@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Chat.Packets
+namespace Networking.Packets
 {
     public abstract class SimplePacket : Packet
     {

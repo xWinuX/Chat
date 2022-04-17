@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Chat.Packets
+namespace Networking.Packets
 {
     public class ClientMessageSentPacket : Packet
     {
@@ -13,7 +13,7 @@ namespace Chat.Packets
 
         public ClientMessageSentPacket(string username, string message)
         {
-            UserName = username.Length > 15 ? username[..15] : username;
+            UserName = username.Length > 15 ? username.Substring(0, 15) : username;
             Message  = message;
         }
 
