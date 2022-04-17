@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
+using Chat.Packets;
 
 namespace Chat.Core
 {
@@ -12,14 +11,11 @@ namespace Chat.Core
     {
         private readonly List<Socket> _clients = new List<Socket>();
 
-        private readonly IConsole         _console;
+        private readonly IConsole _console;
 
         private Socket _listener;
 
-        public TcpServer(IConsole console)
-        {
-            _console = console;
-        }
+        public TcpServer(IConsole console) { _console = console; }
 
         public void Run()
         {
@@ -32,14 +28,14 @@ namespace Chat.Core
                 _listener.Bind(localEndPoint);
                 _listener.Listen(100);
 
-                _console.LogSuccess( "Server Successfully started");
-                _console.Log( "Waiting for connection");
-                
+                _console.LogSuccess("Server Successfully started");
+                _console.Log("Waiting for connection");
+
                 AcceptHandler();
             }
             catch (Exception e)
             {
-                _console.LogError( "SocketException : " + e);
+                _console.LogError("SocketException : " + e);
                 throw;
             }
         }
@@ -57,28 +53,50 @@ namespace Chat.Core
 
         private async Task ReceiveHandler(Socket client)
         {
-            while (true)
+            try
             {
-                try
+                while (true)
                 {
-                    Packet             packet       = new Packet();
-                    ArraySegment<byte> arraySegment = new ArraySegment<byte>(packet.Buffer, 0, Packet.BufferSize);
-                    int                numBytesRead = await client.ReceiveAsync(arraySegment, SocketFlags.None);
+                    byte[]             bytes        = new byte[Packet.BufferSize];
+                    ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
+                    int                numBytesRead = await client.ReceiveAsync(bytes, SocketFlags.None);
                     byte[]             data         = arraySegment.ToArray();
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(Encoding.Default.GetString(data, 1, numBytesRead - 1));
-                    _console.Log( sb.ToString());
-                    await UpdateAllClients(client, data);
-                }
-                catch (Exception)
-                {
-                    _console.LogWarning( "Client has forcefully disconnected!");
-                    CloseHandler(client);
+                    PacketType packetType = Packet.GetType(data);
+                    if (packetType != PacketType.Invalid)
+                    {
+                        try 
+                        {
+                            switch (packetType)
+                            {
+                                case PacketType.ClientConnected:
+                                    ClientConnectedPacket clientConnectedPacket = Packet.TryParse<ClientConnectedPacket>(data, numBytesRead);
+                                    _console.LogSuccess($"User {clientConnectedPacket.UserName} joined!");
+                                    await SendToConnectedClients(clientConnectedPacket.GetBytes());
+                                    break;
+                                case PacketType.ClientMessageSent:
+                                    ClientMessageSentPacket clientMessageSentPacket = Packet.TryParse<ClientMessageSentPacket>(data, numBytesRead);
+                                    _console.Log($"User: {clientMessageSentPacket.UserName} has sent the following: {clientMessageSentPacket.Message}");
+                                    await SendToConnectedClients(clientMessageSentPacket.GetBytes());
+                                    break;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _console.LogError("An Error occured while trying to parse a packet!");
+                            _console.LogError(e.ToString());
+                            throw;
+                        }
+                    }
                 }
             }
+            catch (Exception)
+            {
+                _console.LogWarning("Client has forcefully disconnected!");
+                CloseHandler(client);
+            }
         }
-        
+
         private void CloseHandler(Socket handler)
         {
             if (handler == null) { return; }
@@ -89,20 +107,14 @@ namespace Chat.Core
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
             }
-            catch (Exception) { _console.LogWarning( "Failed to close the clients handler!"); }
-        }
-        
-        private async Task UpdateAllClients(Socket handler, byte[] bytes)
-        {
-            foreach (Socket client in _clients.Where(client => !client.Equals(handler)))
-            {
-                await Send(client, bytes);
-            }
+            catch (Exception) { _console.LogWarning("Failed to close the clients handler!"); }
         }
 
-        private async Task Send(Socket client, byte[] bytes)
+        private async Task SendToConnectedClients(byte[] bytes)
         {
-            await client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None);
+            foreach (Socket client in _clients) { await Send(client, bytes); }
         }
+
+        private async Task Send(Socket client, byte[] bytes) { await client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None); }
     }
 }

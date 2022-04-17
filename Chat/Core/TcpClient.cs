@@ -1,8 +1,8 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
+using Chat.Packets;
 using Chat.Windows;
 
 namespace Chat.Core
@@ -14,18 +14,18 @@ namespace Chat.Core
             _address  = address;
             _port     = port;
             _userName = userName;
-            _chat   = chat;
+            _chat     = chat;
         }
-
-        public bool Connected { get; private set; }
 
         private readonly string _userName;
         private readonly string _address;
         private readonly int    _port;
-
-        private IChat _chat;
+        private readonly IChat  _chat;
 
         private Socket _client;
+
+        private bool _socketIsSending;
+        private bool _socketIsReceiving;
 
         public async Task Start()
         {
@@ -37,50 +37,60 @@ namespace Chat.Core
                 _client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                 await _client.ConnectAsync(endpoint);
-                _chat.AddMessage("DEBUG","Successfully connected");
-                await Send(Packet.CreateClientConnectedPacket(_userName));
-                _chat.AddMessage("DEBUG", "Sent connected packet");
+                await Send(new ClientConnectedPacket(_userName));
                 
-                Connected = true;
-
-                while (true) { await Receive(_client); }
+                ReceiveHandler(_client);
             }
             catch (Exception e) { Console.WriteLine(e.ToString()); }
         }
-        
+
         private void Close(Socket client)
         {
             client.Shutdown(SocketShutdown.Both);
             client.Close();
         }
-
-
-        private async Task Receive(Socket client)
+        
+        private async Task ReceiveHandler(Socket client)
         {
             try
             {
-                Packet             state        = new Packet();
-                ArraySegment<byte> arraySegment = new ArraySegment<byte>(state.Buffer, 0, Packet.BufferSize);
-                int                numBytesRead = await client.ReceiveAsync(arraySegment, 0);
+                while (true)
+                {
+                    byte[]             bytes        = new byte[Packet.BufferSize];
+                    ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
+                    int                numBytesRead = await client.ReceiveAsync(arraySegment, 0);
+                    byte[]             data         = arraySegment.ToArray();
 
-                byte[] data = arraySegment.ToArray();
-                
-                PacketState   packetState = (PacketState)Enum.Parse(typeof(PacketState), data[0].ToString());
-                StringBuilder sb          = new StringBuilder();
-                sb.Append(Encoding.Default.GetString(state.Buffer, 1, numBytesRead - 1));
+                    PacketType packetType = Packet.GetType(data);
 
-                _chat.AddMessage("Test",sb.ToString());
+                    if (packetType != PacketType.Invalid)
+                    {
+                        switch (packetType)
+                        {
+                            case PacketType.ClientConnected:
+                                ClientConnectedPacket clientConnectedPacket = Packet.TryParse<ClientConnectedPacket>(data, numBytesRead);
+                                _chat.AddServerMessage($"{clientConnectedPacket.UserName} has joined the Server!");
+                                break;
+                            case PacketType.ClientMessageSent:
+                                ClientMessageSentPacket clientMessageSentPacketPacket = Packet.TryParse<ClientMessageSentPacket>(data, numBytesRead);
+                                _chat.AddMessage(clientMessageSentPacketPacket.UserName, clientMessageSentPacketPacket.Message);
+                                break;
+                        }
+                    }
+                }
             }
             catch (Exception e) { Console.WriteLine(e.ToString()); }
         }
 
-        public async Task Send(string data) { await Send(Packet.CreateClientConnectedPacket(data)); }
+        public async Task SendMessage(string userName, string message) { await Send(new ClientMessageSentPacket(userName, message)); }
 
         private async Task Send(Packet packet)
         {
             if (_client == null) { return; }
+            
+            byte[] bytes = packet.GetBytes();
 
-            await _client.SendAsync(new ArraySegment<byte>(packet.Buffer, 0, Packet.BufferSize), SocketFlags.None);
+            await _client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None);
         }
     }
 }

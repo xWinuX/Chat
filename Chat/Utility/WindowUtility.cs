@@ -11,5 +11,12 @@ namespace Chat.Utility
             current.Close();
             window.ShowDialog();
         }
+
+        public static void OpenNewWindowAndCloseCurrentOne(Window newWindow, Window current)
+        {
+            newWindow.Activate();
+            current.Close();
+            newWindow.ShowDialog();
+        }
     }
 }

@@ -18,7 +18,7 @@
         </Grid.ColumnDefinitions>
         <Button Grid.Row="0" Grid.Column="0" Name="BtnLeave" HorizontalAlignment="Left" Margin="5" Click="BtnLeave_OnClick">Leave</Button>
         <userControls:ScrollTextDisplay Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" x:Name="ScrvChat" Margin="5" BorderThickness="5" Background="LightGray" />
-        <TextBox Grid.Row="2" Grid.Column="0" Margin="5"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="0" Name="TxbMessage" Margin="5"></TextBox>
         <Button Grid.Row="2" Grid.Column="1" Name="BtnSend" Margin="5" Click="BtnSend_OnClick">Send</Button>
     </Grid>
 </Window>

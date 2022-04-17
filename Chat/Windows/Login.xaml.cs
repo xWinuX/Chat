@@ -9,7 +9,7 @@ namespace Chat.Windows
 
         private void BtnLogin_OnClick(object sender, RoutedEventArgs e)
         {
-            WindowUtility.OpenNewWindowAndCloseCurrentOne<Client>(this);
+            WindowUtility.OpenNewWindowAndCloseCurrentOne(new Client(TxbUserName.Text), this);
         }
     }
 }
