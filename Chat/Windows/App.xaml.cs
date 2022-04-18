@@ -1,9 +1,4 @@
-﻿using System.Windows;
-
-namespace Chat.Windows
+﻿namespace Chat.Windows
 {
-    public partial class App : Application
-    {
-        
-    }
+    public partial class App { }
 }

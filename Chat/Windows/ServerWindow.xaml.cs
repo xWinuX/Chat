@@ -8,9 +8,9 @@ using Networking;
 
 namespace Chat.Windows
 {
-    public partial class Server : IConsole
+    public partial class ServerWindow : IConsole
     {
-        public Server() { InitializeComponent(); }
+        public ServerWindow() { InitializeComponent(); }
 
         protected override void OnInitialized(EventArgs e)
         {

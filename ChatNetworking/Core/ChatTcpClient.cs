@@ -45,5 +45,7 @@ namespace ChatNetworking.Core
         protected override async Task SendAcceptPacket() => await Send(new ClientConnectedPacket(_userName));
 
         protected override async Task SendClosingPacket() => await Send(new ClientDisconnectedPacket(_userName));
+
+        protected override void OnReceiveFail() => _chat.ServerClosed();
     }
 }

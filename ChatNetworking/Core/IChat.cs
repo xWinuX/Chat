@@ -4,5 +4,6 @@
     {
         void AddMessage(string userName, string message);
         void AddServerMessage(string message);
+        void ServerClosed();
     }
 }

@@ -20,7 +20,7 @@ namespace Networking
 
         public void Run()
         {
-            IPAddress  ipAddress     = IPAddress.Parse("192.168.1.127");
+            IPAddress  ipAddress     = IPAddress.Parse("127.0.0.1");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 9999);
             _listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
