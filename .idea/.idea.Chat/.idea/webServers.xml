@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d9d77ef7-9b40-4518-a10b-06fa2aa77d2c" name="Netcup">
+        <fileTransfer rootFolder="/root/chat_server" accessType="SFTP" host="202.61.224.173" port="22" sshConfigId="b8173b75-4397-408b-a4cb-b5f2fdcea2a6" sshConfig="root@202.61.224.173:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="Netcup" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="Netcup">
+        <serverdata>
+          <mappings>
+            <mapping local="C:/Program Files/dotnet/sdk/5.0.202/Sdks/Microsoft.NET.Sdk/analyzers/build/config/AnalysisLevel_5_Default.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat.sln" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Chat.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Core/AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/UserControls/ScrollTextDisplay.xaml" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/UserControls/ScrollTextDisplay.xaml.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Utility/StringExtensions.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Utility/TextBlockBuilder.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Utility/WindowUtility.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/App.xaml" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/App.xaml.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Client.xaml" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Client.xaml.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Login.xaml" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Login.xaml.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Server.xaml" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Server.xaml.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Start.xaml" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/Windows/Start.xaml.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Chat.AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Chat.GeneratedMSBuildEditorConfig.editorconfig" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/GeneratedInternalTypeHelper.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/UserControls/ScrollTextDisplay.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Windows/App.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Windows/Client.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Windows/Login.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Windows/Server.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Chat/obj/Debug/net5.0-windows/Windows/Start.g.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/ChatNetworking/ChatNetworking.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/ChatNetworking/Core/ChatTcpClient.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/ChatNetworking/Core/ChatTcpServer.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/ChatNetworking/Core/IChat.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/ChatNetworking/Properties/AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/LinuxServer/Core/Logger.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/LinuxServer/Core/Program.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/LinuxServer/LinuxServer.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/LinuxServer/Properties/AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/IConsole.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Networking.csproj" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Packets/ClientConnectedPacket.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Packets/ClientMessageSentPacket.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Packets/Packet.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Packets/PacketType.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Packets/SimplePacket.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/Properties/AssemblyInfo.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/TcpClient.cs" web="/" />
+            <mapping local="$PROJECT_DIR$/Networking/TcpServer.cs" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

@@ -1,4 +1,6 @@
-﻿namespace Networking.Packets
+﻿using Networking.Packets;
+
+namespace ChatNetworking.Packets
 {
     public class ClientConnectedPacket : SimplePacket
     {

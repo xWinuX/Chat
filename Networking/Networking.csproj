@@ -39,8 +39,6 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="IConsole.cs" />
-        <Compile Include="Packets\ClientConnectedPacket.cs" />
-        <Compile Include="Packets\ClientMessageSentPacket.cs" />
         <Compile Include="Packets\Packet.cs" />
         <Compile Include="Packets\PacketType.cs" />
         <Compile Include="Packets\SimplePacket.cs" />

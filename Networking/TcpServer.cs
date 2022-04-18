@@ -11,14 +11,14 @@ namespace Networking
     public class TcpServer
     {
         private readonly List<Socket> _clients = new List<Socket>();
-        
+
         private Socket _listener;
 
         protected readonly IConsole Console;
-        
+
         public TcpServer(IConsole console) { Console = console; }
 
-        public async void Run()
+        public async Task Run()
         {
             IPAddress  ipAddress     = IPAddress.Parse("127.0.0.1");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
@@ -63,34 +63,45 @@ namespace Networking
                     int                numBytesRead = await client.ReceiveAsync(arraySegment, SocketFlags.None);
                     byte[]             data         = arraySegment.ToArray();
 
-                    try { await ResolvePacket(data, numBytesRead); }
+                    bool stayConnected;
+                    try { stayConnected = await ResolvePacket(data, numBytesRead); }
                     catch (Exception e)
                     {
                         Console.LogError("An Error occured while trying to parse a packet!");
                         Console.LogError(e.ToString());
                         throw;
                     }
+                    Console.Log(stayConnected.ToString());
                     
+                    if (!stayConnected) { break; }
                 }
+
+                CloseClient(client);
             }
             catch (Exception)
             {
                 Console.LogWarning("Client has forcefully disconnected!");
-                CloseHandler(client);
+                CloseClient(client);
             }
         }
 
-        protected virtual async Task ResolvePacket(byte[] data, int numBytesRead) { }
+        protected virtual async Task<bool> ResolvePacket(byte[] data, int numBytesRead) => false;
 
-        private void CloseHandler(Socket handler)
+        protected void CloseClient(Socket client)
         {
-            if (handler == null) { return; }
+            Console.Log("Close Client");
+            
+            if (client == null) { return; }
 
-            _clients.Remove(handler);
+            Console.Log(_clients.Count.ToString());
+            _clients.Remove(client);
+
+            Console.Log(_clients.Count.ToString());
             try
             {
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
+                client.Shutdown(SocketShutdown.Both);
+                client.Close();
+                Console.Log("Finished closing");
             }
             catch (Exception) { Console.LogWarning("Failed to close the clients handler!"); }
         }

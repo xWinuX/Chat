@@ -31,7 +31,11 @@ namespace Chat.Windows
             }
         }
 
-        private void BtnLeave_OnClick(object sender, RoutedEventArgs e) { }
+        private void BtnLeave_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.Close();
+            Close();
+        }
 
         private void BtnSend_OnClick(object sender, RoutedEventArgs e)
         {

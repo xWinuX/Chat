@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Sockets;
+using System.Threading.Tasks;
+using ChatNetworking.Packets;
+using ChatNetworking.Utility;
 using Networking;
 using Networking.Packets;
 
@@ -8,26 +11,32 @@ namespace ChatNetworking.Core
     {
         public ChatTcpServer(IConsole console) : base(console) { }
 
-        protected override async Task ResolvePacket(byte[] data, int numBytesRead)
+        protected override async Task<bool> ResolvePacket(byte[] data, int numBytesRead)
         {
-            
             PacketType packetType = Packet.GetType(data);
             if (packetType != PacketType.Invalid)
             {
                 switch (packetType)
                 {
                     case PacketType.ClientConnected:
-                        ClientConnectedPacket clientConnectedPacket = Packet.TryParse<ClientConnectedPacket>(data, numBytesRead);
+                        ClientConnectedPacket clientConnectedPacket = PacketUtility.TryParse<ClientConnectedPacket>(data, numBytesRead);
                         Console.LogSuccess($"User {clientConnectedPacket.UserName} joined!");
                         await SendToConnectedClients(clientConnectedPacket.GetBytes());
                         break;
+                    case PacketType.ClientDisconnected:
+                        ClientDisconnectedPacket clientDisconnectedPacket = PacketUtility.TryParse<ClientDisconnectedPacket>(data, numBytesRead);
+                        Console.LogSuccess($"User {clientDisconnectedPacket.UserName} disconnected!");
+                        await SendToConnectedClients(clientDisconnectedPacket.GetBytes());
+                        return false;
                     case PacketType.ClientMessageSent:
-                        ClientMessageSentPacket clientMessageSentPacket = Packet.TryParse<ClientMessageSentPacket>(data, numBytesRead);
+                        ClientMessageSentPacket clientMessageSentPacket = PacketUtility.TryParse<ClientMessageSentPacket>(data, numBytesRead);
                         Console.Log($"User: {clientMessageSentPacket.UserName} has sent the following: {clientMessageSentPacket.Message}");
                         await SendToConnectedClients(clientMessageSentPacket.GetBytes());
                         break;
                 }
             }
+
+            return true;
         }
     }
 }

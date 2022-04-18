@@ -1,6 +1,7 @@
 ﻿using System.Text;
+using Networking.Packets;
 
-namespace Networking.Packets
+namespace ChatNetworking.Packets
 {
     public class ClientMessageSentPacket : Packet
     {

@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using ChatNetworking.Packets;
+using ChatNetworking.Utility;
 using Networking;
 using Networking.Packets;
 
@@ -6,32 +8,44 @@ namespace ChatNetworking.Core
 {
     public class ChatTcpClient : TcpClient
     {
-        private readonly IChat _chat;
+        private readonly string _userName;
+        private readonly IChat  _chat;
 
-        public ChatTcpClient(string address, int port, string userName, IChat chat) : base(address, port, userName)
+        public ChatTcpClient(string address, int port, string userName, IChat chat) : base(address, port)
         {
-            _chat = chat;
+            _userName = userName;
+            _chat     = chat;
         }
         
         public async Task SendMessage(string userName, string message) { await Send(new ClientMessageSentPacket(userName, message)); }
 
-        protected override void ResolvePacket(byte[] data, int numBytesRead)
+        protected override bool ResolvePacket(byte[] data, int numBytesRead)
         {
             PacketType packetType = Packet.GetType(data);
 
-            if (packetType == PacketType.Invalid) { return; }
+            if (packetType == PacketType.Invalid) { return true; }
 
             switch (packetType)
             {
                 case PacketType.ClientConnected:
-                    ClientConnectedPacket clientConnectedPacket = Packet.TryParse<ClientConnectedPacket>(data, numBytesRead);
+                    ClientConnectedPacket clientConnectedPacket = PacketUtility.TryParse<ClientConnectedPacket>(data, numBytesRead);
                     _chat.AddServerMessage($"{clientConnectedPacket.UserName} has joined the Server!");
                     break;
+                case PacketType.ClientDisconnected:
+                    ClientDisconnectedPacket clientDisconnectedPacket = PacketUtility.TryParse<ClientDisconnectedPacket>(data, numBytesRead);
+                    _chat.AddServerMessage($"{clientDisconnectedPacket.UserName} has left the Server!");
+                    return false;
                 case PacketType.ClientMessageSent:
-                    ClientMessageSentPacket clientMessageSentPacketPacket = Packet.TryParse<ClientMessageSentPacket>(data, numBytesRead);
+                    ClientMessageSentPacket clientMessageSentPacketPacket = PacketUtility.TryParse<ClientMessageSentPacket>(data, numBytesRead);
                     _chat.AddMessage(clientMessageSentPacketPacket.UserName, clientMessageSentPacketPacket.Message);
                     break;
             }
+
+            return true;
         }
+
+        protected override async Task SendAcceptPacket() => await Send(new ClientConnectedPacket(_userName));
+
+        protected override async Task SendClosingPacket() => await Send(new ClientDisconnectedPacket(_userName));
     }
 }

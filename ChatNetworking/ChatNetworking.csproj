@@ -41,7 +41,11 @@
         <Compile Include="Core\ChatTcpClient.cs" />
         <Compile Include="Core\ChatTcpServer.cs" />
         <Compile Include="Core\IChat.cs" />
+        <Compile Include="Packets\ClientConnectedPacket.cs" />
+        <Compile Include="Packets\ClientDisconnectedPacket.cs" />
+        <Compile Include="Packets\ClientMessageSentPacket.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Utility\PacketUtility.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Networking\Networking.csproj">

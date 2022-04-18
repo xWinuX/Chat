@@ -4,6 +4,7 @@
     {
         Invalid,
         ClientConnected,
+        ClientDisconnected,
         ClientMessageSent,
     }
 }
