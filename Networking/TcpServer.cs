@@ -18,10 +18,10 @@ namespace Networking
 
         public TcpServer(IConsole console) { Console = console; }
 
-        public async Task Run()
+        public void Run()
         {
-            IPAddress  ipAddress     = IPAddress.Parse("127.0.0.1");
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+            IPAddress  ipAddress     = IPAddress.Parse("192.168.1.127");
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 9999);
             _listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             try
@@ -32,7 +32,7 @@ namespace Networking
                 Console.LogSuccess("Server Successfully started");
                 Console.Log("Waiting for connection");
 
-                await AcceptHandler();
+                AcceptHandler();
             }
             catch (Exception e)
             {
@@ -43,12 +43,21 @@ namespace Networking
 
         private async Task AcceptHandler()
         {
-            while (true)
+            try
             {
-                Socket client = await _listener.AcceptAsync();
-                Console.LogSuccess("New client connected!");
-                _clients.Add(client);
-                ReceiveHandler(client);
+                while (true)
+                {
+                    Socket client = await _listener.AcceptAsync();
+                    Console.LogSuccess("New client connected!");
+                    _clients.Add(client);
+                    ReceiveHandler(client);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.LogError("Accept Error");
+                Console.LogError(e.ToString());
+                throw;
             }
         }
 
@@ -64,7 +73,7 @@ namespace Networking
                     byte[]             data         = arraySegment.ToArray();
 
                     bool stayConnected;
-                    try { stayConnected = await ResolvePacket(data, numBytesRead); }
+                    try { stayConnected = await ResolvePacket(client, data, numBytesRead); }
                     catch (Exception e)
                     {
                         Console.LogError("An Error occured while trying to parse a packet!");
@@ -75,8 +84,6 @@ namespace Networking
                     
                     if (!stayConnected) { break; }
                 }
-
-                CloseClient(client);
             }
             catch (Exception)
             {
@@ -85,7 +92,7 @@ namespace Networking
             }
         }
 
-        protected virtual async Task<bool> ResolvePacket(byte[] data, int numBytesRead) => false;
+        protected virtual async Task<bool> ResolvePacket(Socket client, byte[] data, int numBytesRead) => false;
 
         protected void CloseClient(Socket client)
         {

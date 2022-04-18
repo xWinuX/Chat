@@ -5,7 +5,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:userControls="clr-namespace:Chat.UserControls"
         mc:Ignorable="d"
-        Title="Client" Height="450" Width="800">
+        Title="Client" Height="450" Width="800"
+        Closed="Client_OnClosed"
+        >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition MaxHeight="30"/>

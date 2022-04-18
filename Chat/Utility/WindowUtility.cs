@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Text;
+using System.Windows;
 
 namespace Chat.Utility
 {
@@ -18,5 +19,7 @@ namespace Chat.Utility
             current.Close();
             newWindow.ShowDialog();
         }
+
+        public static void ShowErrorMessageBox(Window owner, string text) { MessageBox.Show(owner, text, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
     }
 }

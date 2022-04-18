@@ -22,51 +22,38 @@ namespace Networking
 
         public async Task Start()
         {
-            try
-            {
-                IPAddress  ipAddress = IPAddress.Parse(_address);
-                IPEndPoint endpoint  = new IPEndPoint(ipAddress, _port);
+            IPAddress  ipAddress = IPAddress.Parse(_address);
+            IPEndPoint endpoint  = new IPEndPoint(ipAddress, _port);
 
-                _client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-                await _client.ConnectAsync(endpoint);
-                await SendAcceptPacket();
+            await _client.ConnectAsync(endpoint);
+            await SendAcceptPacket();
 
-                await ReceiveHandler(_client);
-            }
-            catch (Exception e) { Console.WriteLine(e.ToString()); }
+            await ReceiveHandler(_client);
         }
 
-        public async void Close() { await SendClosingPacket(); }
-
-        private void CloseSocket()
+        public async Task Close()
         {
+            await SendClosingPacket();
             _client.Shutdown(SocketShutdown.Both);
             _client.Close();
         }
-
+        
         private async Task ReceiveHandler(Socket client)
         {
-            try
+            while (true)
             {
-                while (true)
-                {
-                    byte[]             bytes        = new byte[Packet.BufferSize];
-                    ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
-                    int                numBytesRead = await client.ReceiveAsync(arraySegment, 0);
-                    byte[]             data         = arraySegment.ToArray();
+                byte[]             bytes        = new byte[Packet.BufferSize];
+                ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
+                int                numBytesRead = await client.ReceiveAsync(arraySegment, 0);
+                byte[]             data         = arraySegment.ToArray();
 
-                    bool stayConnected = ResolvePacket(data, numBytesRead);
-
-                    if (!stayConnected) { break; }
-                }
-                
-                CloseSocket();
+                ResolvePacket(data, numBytesRead);
             }
-            catch (Exception e) { Console.WriteLine(e.ToString()); }
         }
 
-        protected virtual bool ResolvePacket(byte[] data, int numBytesRead) => false;
+        protected virtual void ResolvePacket(byte[] data, int numBytesRead) { }
 
         protected virtual async Task SendClosingPacket() { }
 

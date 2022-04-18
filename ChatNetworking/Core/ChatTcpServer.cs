@@ -11,7 +11,7 @@ namespace ChatNetworking.Core
     {
         public ChatTcpServer(IConsole console) : base(console) { }
 
-        protected override async Task<bool> ResolvePacket(byte[] data, int numBytesRead)
+        protected override async Task<bool> ResolvePacket(Socket client, byte[] data, int numBytesRead)
         {
             PacketType packetType = Packet.GetType(data);
             if (packetType != PacketType.Invalid)
@@ -26,6 +26,7 @@ namespace ChatNetworking.Core
                     case PacketType.ClientDisconnected:
                         ClientDisconnectedPacket clientDisconnectedPacket = PacketUtility.TryParse<ClientDisconnectedPacket>(data, numBytesRead);
                         Console.LogSuccess($"User {clientDisconnectedPacket.UserName} disconnected!");
+                        CloseClient(client);
                         await SendToConnectedClients(clientDisconnectedPacket.GetBytes());
                         return false;
                     case PacketType.ClientMessageSent:

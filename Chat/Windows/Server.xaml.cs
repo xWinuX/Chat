@@ -38,7 +38,7 @@ namespace Chat.Windows
             OpenServer();
         }
 
-        private TextBlockBuilder _builder => new TextBlockBuilder();
+        private static TextBlockBuilder Builder => new TextBlockBuilder();
 
         private void BtnCloseServer_OnClick(object sender, RoutedEventArgs e) { }
 
@@ -54,12 +54,12 @@ namespace Chat.Windows
             ScrtConsole.AddText(textBlock);
         }
 
-        public void Log(string message) { AppendToConsole(_builder.WithMessage(message).Build()); }
+        public void Log(string message) { AppendToConsole(Builder.WithMessage(message).Build()); }
 
-        public void LogSuccess(string message) { AppendToConsole(_builder.WithMessage(message).WithColor(Colors.Lime).Build()); }
+        public void LogSuccess(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Lime).Build()); }
 
-        public void LogWarning(string message) { AppendToConsole(_builder.WithMessage(message).WithColor(Colors.Yellow).Build()); }
+        public void LogWarning(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Yellow).Build()); }
 
-        public void LogError(string message) { AppendToConsole(_builder.WithMessage(message).WithColor(Colors.Red).Build()); }
+        public void LogError(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Red).Build()); }
     }
 }

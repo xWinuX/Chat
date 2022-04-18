@@ -9,7 +9,8 @@ namespace Chat.Windows
 
         private void BtnLogin_OnClick(object sender, RoutedEventArgs e)
         {
-            WindowUtility.OpenNewWindowAndCloseCurrentOne(new Client(TxbUserName.Text), this);
+            if (int.TryParse(TxbPort.Text, out int port)) { WindowUtility.OpenNewWindowAndCloseCurrentOne(new Client(TxbUserName.Text, TxbAddress.Text, port), this); }
+            else { WindowUtility.ShowErrorMessageBox(this, "Please enter a valid port"); }
         }
     }
 }

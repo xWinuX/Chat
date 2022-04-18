@@ -19,11 +19,11 @@ namespace ChatNetworking.Core
         
         public async Task SendMessage(string userName, string message) { await Send(new ClientMessageSentPacket(userName, message)); }
 
-        protected override bool ResolvePacket(byte[] data, int numBytesRead)
+        protected override void ResolvePacket(byte[] data, int numBytesRead)
         {
             PacketType packetType = Packet.GetType(data);
 
-            if (packetType == PacketType.Invalid) { return true; }
+            if (packetType == PacketType.Invalid) { return; }
 
             switch (packetType)
             {
@@ -34,14 +34,12 @@ namespace ChatNetworking.Core
                 case PacketType.ClientDisconnected:
                     ClientDisconnectedPacket clientDisconnectedPacket = PacketUtility.TryParse<ClientDisconnectedPacket>(data, numBytesRead);
                     _chat.AddServerMessage($"{clientDisconnectedPacket.UserName} has left the Server!");
-                    return false;
+                    break;
                 case PacketType.ClientMessageSent:
                     ClientMessageSentPacket clientMessageSentPacketPacket = PacketUtility.TryParse<ClientMessageSentPacket>(data, numBytesRead);
                     _chat.AddMessage(clientMessageSentPacketPacket.UserName, clientMessageSentPacketPacket.Message);
                     break;
             }
-
-            return true;
         }
 
         protected override async Task SendAcceptPacket() => await Send(new ClientConnectedPacket(_userName));
