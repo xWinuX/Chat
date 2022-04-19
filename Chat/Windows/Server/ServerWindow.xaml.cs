@@ -10,19 +10,26 @@ namespace Chat.Windows.Server
 {
     public partial class ServerWindow : IConsole
     {
-        private readonly string _address;
-        private readonly int    _port;
+        private static   TextBlockBuilder Builder => new TextBlockBuilder();
+        private readonly string           _address;
+        private readonly int              _port;
 
         private ChatTcpServer _server;
-        
+
         public ServerWindow(string address, int port)
         {
             _address = address;
             _port    = port;
             InitializeComponent();
         }
-        
-        private static TextBlockBuilder Builder => new TextBlockBuilder();
+
+        public void Log(string message) { AppendToConsole(Builder.WithMessage(message).Build()); }
+
+        public void LogSuccess(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Lime).Build()); }
+
+        public void LogWarning(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Yellow).Build()); }
+
+        public void LogError(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Red).Build()); }
 
         private static void AddTimeToTextBlock(TextBlock textBlock)
         {
@@ -36,14 +43,6 @@ namespace Chat.Windows.Server
             ScrtConsole.AddText(textBlock);
         }
 
-        public void Log(string message) { AppendToConsole(Builder.WithMessage(message).Build()); }
-
-        public void LogSuccess(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Lime).Build()); }
-
-        public void LogWarning(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Yellow).Build()); }
-
-        public void LogError(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Red).Build()); }
-
         private void ServerWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             try
@@ -51,10 +50,10 @@ namespace Chat.Windows.Server
                 _server = new ChatTcpServer(_address, _port, this);
                 _server.Run();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-                throw;
+                WindowUtility.ShowErrorMessageBox(this, "Failed to start server!");
+                WindowUtility.OpenNewWindowAndCloseCurrentOne<ServerSetupWindow>(this);
             }
 
         }

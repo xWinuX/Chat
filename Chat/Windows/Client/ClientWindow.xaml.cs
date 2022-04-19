@@ -9,11 +9,11 @@ namespace Chat.Windows.Client
 {
     public partial class ClientWindow : IChat
     {
-        private readonly string _userName;
         private readonly string _address;
-        private readonly int    _port;
 
         private readonly ChatTcpClient _client;
+        private readonly int           _port;
+        private readonly string        _userName;
 
         private bool _serverConnectionIsStable;
 

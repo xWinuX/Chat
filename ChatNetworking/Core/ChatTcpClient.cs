@@ -8,8 +8,8 @@ namespace ChatNetworking.Core
 {
     public class ChatTcpClient : TcpClient
     {
-        private readonly string _userName;
         private readonly IChat  _chat;
+        private readonly string _userName;
 
         public ChatTcpClient(string address, int port, string userName, IChat chat) : base(address, port)
         {

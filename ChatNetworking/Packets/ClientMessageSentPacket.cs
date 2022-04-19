@@ -5,12 +5,12 @@ namespace ChatNetworking.Packets
 {
     public class ClientMessageSentPacket : Packet
     {
+        public string Message  { get; }
+
+        public static   int MessageStartIndex => (2 + (EncodingWorstCasePerCharacter * 15)); // State(1) + UsernameLength(1) + Username(15 character => 4 bytes per character UTF8)
         public override PacketType Type => PacketType.ClientMessageSent;
 
-        public static int MessageStartIndex => (2 + (EncodingWorstCasePerCharacter * 15)); // State(1) + UsernameLength(1) + Username(15 character => 4 bytes per character UTF8)
-
         public string UserName { get; }
-        public string Message  { get; }
 
         public ClientMessageSentPacket(string username, string message)
         {

@@ -9,10 +9,9 @@ namespace Networking
 {
     public abstract class TcpClient : SocketBehaviour
     {
-        protected TcpClient(string address, int port) : base(address, port) { }
-
         private Socket _client;
         private bool   _closed;
+        protected TcpClient(string address, int port) : base(address, port) { }
 
         /// <summary>
         /// Starts the client
@@ -48,6 +47,23 @@ namespace Networking
             Close(_client);
         }
 
+        protected async Task Send(Packet packet)
+        {
+            if (_client == null) { return; }
+
+            byte[] bytes = packet.GetBytes();
+
+            await _client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None);
+        }
+
+        protected abstract void ResolvePacket(byte[] data, int numBytesRead);
+
+        protected abstract Task SendClosingPacket();
+
+        protected abstract Task SendAcceptPacket();
+
+        protected abstract void OnReceiveFail();
+
         private async Task ReceiveHandler(Socket client)
         {
             try
@@ -67,22 +83,5 @@ namespace Networking
                 if (!_closed) { OnReceiveFail(); }
             }
         }
-
-        protected async Task Send(Packet packet)
-        {
-            if (_client == null) { return; }
-
-            byte[] bytes = packet.GetBytes();
-
-            await _client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None);
-        }
-
-        protected abstract void ResolvePacket(byte[] data, int numBytesRead);
-
-        protected abstract Task SendClosingPacket();
-
-        protected abstract Task SendAcceptPacket();
-
-        protected abstract void OnReceiveFail();
     }
 }

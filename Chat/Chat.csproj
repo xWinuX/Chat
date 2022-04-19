@@ -7,15 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ApplicationDefinition Include="Windows\App.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-      </ApplicationDefinition>
+        <ApplicationDefinition Include="Windows\App.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+        </ApplicationDefinition>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ChatNetworking\ChatNetworking.csproj" />
-      <ProjectReference Include="..\Networking\Networking.csproj" />
+        <ProjectReference Include="..\ChatNetworking\ChatNetworking.csproj"/>
+        <ProjectReference Include="..\Networking\Networking.csproj"/>
     </ItemGroup>
 
 </Project>

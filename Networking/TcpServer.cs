@@ -15,13 +15,12 @@ namespace Networking
         private readonly List<Socket> _clients = new List<Socket>();
 
         private Socket _listener;
-
         protected TcpServer(string address, int port, IConsole console) : base(address, port) { Console = console; }
 
         /// <summary>
         /// Runs the server
         /// </summary>
-        public async void Run()
+        public void Run()
         {
             IPAddress  ipAddress     = IPAddress.Parse(Address);
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, Port);
@@ -29,11 +28,12 @@ namespace Networking
 
             try
             {
+                Console.Log("Trying to bind server...");
                 _listener.Bind(localEndPoint);
                 _listener.Listen(100);
 
                 Console.LogSuccess("Server Successfully started");
-                Console.Log("Waiting for connection");
+                Console.Log("Waiting for connection...");
 
                 AcceptHandler();
             }
@@ -108,8 +108,6 @@ namespace Networking
                         Console.LogError(e.ToString());
                         throw;
                     }
-
-                    Console.Log(stayConnected.ToString());
 
                     if (!stayConnected) { break; }
                 }

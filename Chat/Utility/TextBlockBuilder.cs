@@ -6,9 +6,9 @@ namespace Chat.Utility
 {
     public class TextBlockBuilder
     {
-        private string _message = string.Empty;
         private Brush  _color   = new SolidColorBrush(Colors.White);
-        
+        private string _message = string.Empty;
+
         public TextBlockBuilder WithColor(Color color)
         {
             _color = new SolidColorBrush(color);

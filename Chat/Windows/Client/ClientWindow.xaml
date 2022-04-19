@@ -7,8 +7,7 @@
         mc:Ignorable="d"
         Title="Client" Height="450" Width="500"
         Closed="ClientWindow_OnClosed"
-        Loaded="ClientWindow_OnLoaded"
-        >
+        Loaded="ClientWindow_OnLoaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -16,10 +15,10 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition MaxWidth="100"/>
+            <ColumnDefinition MaxWidth="100" />
         </Grid.ColumnDefinitions>
         <userControls:ScrollTextDisplay Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" x:Name="ScrvChat" Margin="5" BorderThickness="5" Background="LightGray" />
-        <TextBox Grid.Row="1" Grid.Column="0" Name="TxbMessage" Margin="5"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="0" Name="TxbMessage" Margin="5" />
         <Button Grid.Row="1" Grid.Column="1" Name="BtnSend" Margin="5" Click="BtnSend_OnClick">Send</Button>
     </Grid>
 </Window>
