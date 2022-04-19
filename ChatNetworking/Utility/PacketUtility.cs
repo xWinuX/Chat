@@ -18,15 +18,15 @@ namespace ChatNetworking.Utility
                 {
                     case PacketType.ClientConnected:
                         userName = Encoding.UTF8.GetString(bytes, 1, bytesSent - 1);
-                        return (new ClientConnectedPacket(userName)) as T;
+                        return new ClientConnectedPacket(userName) as T;
                     case PacketType.ClientDisconnected:
                         userName = Encoding.UTF8.GetString(bytes, 1, bytesSent - 1);
-                        return (new ClientDisconnectedPacket(userName)) as T;
+                        return new ClientDisconnectedPacket(userName) as T;
                     case PacketType.ClientMessageSent:
                         int userNameLength = bytes[1];
                         userName = Encoding.UTF8.GetString(bytes, 2, userNameLength);
                         string message = Encoding.UTF8.GetString(bytes, ClientMessageSentPacket.MessageStartIndex, bytesSent - ClientMessageSentPacket.MessageStartIndex);
-                        return (new ClientMessageSentPacket(userName, message)) as T;
+                        return new ClientMessageSentPacket(userName, message) as T;
                 }
 
                 return null;

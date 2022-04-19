@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -56,18 +57,12 @@ namespace Chat.Windows.Client
             WindowUtility.OpenNewWindowAndCloseCurrentOne<ClientLoginWindow>(this);
         }
 
-        private async void BtnLeave_OnClick(object sender, RoutedEventArgs e)
-        {
-            await _client.Close();
-            Close();
-        }
-
         private async void BtnSend_OnClick(object sender, RoutedEventArgs e)
         {
             if (TxbMessage.Text == string.Empty) { return; } // Message shouldn't be empty 
 
             try { await _client.SendMessage(_userName, TxbMessage.Text); }
-            catch (Exception exception)
+            catch (Exception)
             {
                 ServerClosed();
                 return;

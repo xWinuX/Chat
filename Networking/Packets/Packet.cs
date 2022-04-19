@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Text;
 
 namespace Networking.Packets
 {
     public abstract class Packet
     {
-        public const int BufferSize                    = 1024;
-        public const int EncodingWorstCasePerCharacter = 4;
+        public const    int BufferSize                    = 1024;
+        protected const int EncodingWorstCasePerCharacter = 4;
 
-        public abstract PacketType Type { get; }
+        protected abstract PacketType Type { get; }
 
         public abstract byte[] GetBytes();
 

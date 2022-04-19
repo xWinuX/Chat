@@ -2,7 +2,7 @@
 
 namespace Chat.UserControls
 {
-    public partial class ScrollTextDisplay : UserControl
+    public partial class ScrollTextDisplay
     {
         public ScrollTextDisplay() { InitializeComponent(); }
 

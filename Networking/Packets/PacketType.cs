@@ -5,6 +5,6 @@
         Invalid,
         ClientConnected,
         ClientDisconnected,
-        ClientMessageSent,
+        ClientMessageSent
     }
 }

@@ -27,7 +27,7 @@ namespace Chat.Utility
             {
                 Text       = _message,
                 Foreground = _color,
-                Margin = new Thickness(5, 1, 1, 5),
+                Margin = new Thickness(5, 1, 1, 5)
             };
 
             return textBlock;
