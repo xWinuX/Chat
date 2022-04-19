@@ -2,36 +2,25 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using Networking.Packets;
 
 namespace Networking
 {
-    public abstract class TcpClient
+    public abstract class TcpClient : SocketBehaviour
     {
-        protected TcpClient(string address, int port)
-        {
-            _address            = address;
-            _port               = port;
-            _receiveCancelToken = _receiveCancelTokenSource.Token;
-        }
-
-        private readonly string _address;
-        private readonly int    _port;
+        protected TcpClient(string address, int port) : base(address, port) { }
 
         private Socket _client;
-
-        private readonly CancellationTokenSource _receiveCancelTokenSource = new CancellationTokenSource();
-        private readonly CancellationToken       _receiveCancelToken;
+        private bool   _closed;
 
         /// <summary>
         /// Starts the client
         /// </summary>
         public async Task Start()
         {
-            IPAddress  ipAddress = IPAddress.Parse(_address);
-            IPEndPoint endpoint  = new IPEndPoint(ipAddress, _port);
+            IPAddress  ipAddress = IPAddress.Parse(Address);
+            IPEndPoint endpoint  = new IPEndPoint(ipAddress, Port);
 
             _client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -39,28 +28,14 @@ namespace Networking
             {
                 await _client.ConnectAsync(endpoint);
                 await SendAcceptPacket();
-                
-                Task.Run(() => ReceiveHandler(_client), _receiveCancelToken);
+
+                ReceiveHandler(_client);
             }
             catch (Exception)
             {
-                ForceClose();
+                Close(_client);
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Forces socket to close without sending a closing packet
-        /// use this when the connection to the server fails
-        /// </summary>
-        private void ForceClose()
-        {
-            try
-            {
-                _client.Shutdown(SocketShutdown.Both); 
-                _receiveCancelTokenSource.Dispose();
-            }
-            finally { _client.Close(); }
         }
 
         /// <summary>
@@ -68,17 +43,16 @@ namespace Networking
         /// </summary>
         public async Task Close()
         {
+            _closed = true;
             await SendClosingPacket();
-            _receiveCancelTokenSource.Cancel();
-            _receiveCancelTokenSource.Dispose();
-            ForceClose();
+            Close(_client);
         }
 
         private async Task ReceiveHandler(Socket client)
         {
             try
             {
-                while (!_receiveCancelToken.IsCancellationRequested)
+                while (true)
                 {
                     byte[]             bytes        = new byte[Packet.BufferSize];
                     ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
@@ -88,9 +62,12 @@ namespace Networking
                     ResolvePacket(data, numBytesRead);
                 }
             }
-            catch (Exception e) { OnReceiveFail(); }
+            catch (Exception)
+            {
+                if (!_closed) { OnReceiveFail(); }
+            }
         }
-        
+
         protected async Task Send(Packet packet)
         {
             if (_client == null) { return; }

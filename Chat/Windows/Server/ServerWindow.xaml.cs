@@ -6,41 +6,23 @@ using Chat.Utility;
 using ChatNetworking.Core;
 using Networking;
 
-namespace Chat.Windows
+namespace Chat.Windows.Server
 {
     public partial class ServerWindow : IConsole
     {
-        public ServerWindow() { InitializeComponent(); }
+        private readonly string _address;
+        private readonly int    _port;
 
-        protected override void OnInitialized(EventArgs e)
+        private ChatTcpServer _server;
+        
+        public ServerWindow(string address, int port)
         {
-            base.OnInitialized(e);
-
-            StartTcpServer();
+            _address = address;
+            _port    = port;
+            InitializeComponent();
         }
-
-        private void StartTcpServer()
-        {
-            void OpenServer()
-            {
-                try
-                {
-                    ChatTcpServer server = new ChatTcpServer(this);
-                    server.Run();
-                }
-                catch (Exception)
-                {
-                    LogError("TCP Server crashed, restarting...");
-                    OpenServer();
-                }
-            }
-
-            OpenServer();
-        }
-
+        
         private static TextBlockBuilder Builder => new TextBlockBuilder();
-
-        private void BtnCloseServer_OnClick(object sender, RoutedEventArgs e) { }
 
         private static void AddTimeToTextBlock(TextBlock textBlock)
         {
@@ -61,5 +43,20 @@ namespace Chat.Windows
         public void LogWarning(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Yellow).Build()); }
 
         public void LogError(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Red).Build()); }
+
+        private void ServerWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _server = new ChatTcpServer(_address, _port, this);
+                _server.Run();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+
+        }
     }
 }

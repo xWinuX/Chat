@@ -5,7 +5,7 @@ using System.Windows.Media;
 using Chat.Utility;
 using ChatNetworking.Core;
 
-namespace Chat.Windows
+namespace Chat.Windows.Client
 {
     public partial class ClientWindow : IChat
     {
@@ -15,7 +15,7 @@ namespace Chat.Windows
 
         private readonly ChatTcpClient _client;
 
-        private bool _clientSuccessfullyStarted = false;
+        private bool _serverConnectionIsStable;
 
         public ClientWindow(string userName, string address, int port)
         {
@@ -51,8 +51,9 @@ namespace Chat.Windows
 
         public void ServerClosed()
         {
+            _serverConnectionIsStable = false;
             WindowUtility.ShowErrorMessageBox(this, "Connection to server failed or was closed");
-            WindowUtility.OpenNewWindowAndCloseCurrentOne<LoginWindow>(this);
+            WindowUtility.OpenNewWindowAndCloseCurrentOne<ClientLoginWindow>(this);
         }
 
         private async void BtnLeave_OnClick(object sender, RoutedEventArgs e)
@@ -65,14 +66,19 @@ namespace Chat.Windows
         {
             if (TxbMessage.Text == string.Empty) { return; } // Message shouldn't be empty 
 
-            await _client.SendMessage(_userName, TxbMessage.Text);
+            try { await _client.SendMessage(_userName, TxbMessage.Text); }
+            catch (Exception exception)
+            {
+                ServerClosed();
+                return;
+            }
 
             TxbMessage.Text = string.Empty;
         }
 
         private async void ClientWindow_OnClosed(object? sender, EventArgs e)
         {
-            if (!_clientSuccessfullyStarted) { return; }
+            if (!_serverConnectionIsStable) { return; }
 
             await _client.Close();
         }
@@ -84,7 +90,7 @@ namespace Chat.Windows
             try
             {
                 await _client.Start();
-                _clientSuccessfullyStarted = true;
+                _serverConnectionIsStable = true;
                 AddServerMessage("Successfully connected to server!");
             }
             catch (Exception) { ServerClosed(); } // If connection fails display message box and go back to login

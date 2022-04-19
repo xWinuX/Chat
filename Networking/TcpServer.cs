@@ -8,20 +8,23 @@ using Networking.Packets;
 
 namespace Networking
 {
-    public class TcpServer
+    public abstract class TcpServer : SocketBehaviour
     {
+        protected readonly IConsole Console;
+
         private readonly List<Socket> _clients = new List<Socket>();
 
         private Socket _listener;
 
-        protected readonly IConsole Console;
+        protected TcpServer(string address, int port, IConsole console) : base(address, port) { Console = console; }
 
-        public TcpServer(IConsole console) { Console = console; }
-
-        public void Run()
+        /// <summary>
+        /// Runs the server
+        /// </summary>
+        public async void Run()
         {
-            IPAddress  ipAddress     = IPAddress.Parse("127.0.0.1");
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 9999);
+            IPAddress  ipAddress     = IPAddress.Parse(Address);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, Port);
             _listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             try
@@ -36,10 +39,35 @@ namespace Networking
             }
             catch (Exception e)
             {
-                Console.LogError("SocketException : " + e);
+                Console.LogError("Server start failed!");
+                Console.LogError(e.ToString());
                 throw;
             }
         }
+
+        protected void CloseClient(Socket client)
+        {
+            Console.Log("Closing client connection...");
+
+            if (client == null) { return; }
+
+            _clients.Remove(client);
+
+            try
+            {
+                client.Shutdown(SocketShutdown.Both);
+                client.Close();
+                Console.Log("Finished closing client connection!");
+            }
+            catch (Exception) { Console.LogWarning("Failed to close the clients handler!"); }
+        }
+
+        protected async Task SendToConnectedClients(byte[] bytes)
+        {
+            foreach (Socket client in _clients) { await Send(client, bytes); }
+        }
+
+        protected abstract Task<bool> ResolvePacket(Socket client, byte[] data, int numBytesRead);
 
         private async Task AcceptHandler()
         {
@@ -80,8 +108,9 @@ namespace Networking
                         Console.LogError(e.ToString());
                         throw;
                     }
+
                     Console.Log(stayConnected.ToString());
-                    
+
                     if (!stayConnected) { break; }
                 }
             }
@@ -90,32 +119,6 @@ namespace Networking
                 Console.LogWarning("Client has forcefully disconnected!");
                 CloseClient(client);
             }
-        }
-
-        protected virtual async Task<bool> ResolvePacket(Socket client, byte[] data, int numBytesRead) => false;
-
-        protected void CloseClient(Socket client)
-        {
-            Console.Log("Close Client");
-            
-            if (client == null) { return; }
-
-            Console.Log(_clients.Count.ToString());
-            _clients.Remove(client);
-
-            Console.Log(_clients.Count.ToString());
-            try
-            {
-                client.Shutdown(SocketShutdown.Both);
-                client.Close();
-                Console.Log("Finished closing");
-            }
-            catch (Exception) { Console.LogWarning("Failed to close the clients handler!"); }
-        }
-
-        protected async Task SendToConnectedClients(byte[] bytes)
-        {
-            foreach (Socket client in _clients) { await Send(client, bytes); }
         }
 
         private async Task Send(Socket client, byte[] bytes) { await client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None); }

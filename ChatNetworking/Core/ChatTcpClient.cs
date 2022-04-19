@@ -16,7 +16,7 @@ namespace ChatNetworking.Core
             _userName = userName;
             _chat     = chat;
         }
-        
+
         public async Task SendMessage(string userName, string message) { await Send(new ClientMessageSentPacket(userName, message)); }
 
         protected override void ResolvePacket(byte[] data, int numBytesRead)

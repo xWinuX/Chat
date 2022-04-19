@@ -9,7 +9,7 @@ namespace ChatNetworking.Core
 {
     public class ChatTcpServer : TcpServer
     {
-        public ChatTcpServer(IConsole console) : base(console) { }
+        public ChatTcpServer(string address, int port, IConsole console) : base(address, port, console) { }
 
         protected override async Task<bool> ResolvePacket(Socket client, byte[] data, int numBytesRead)
         {

@@ -1,0 +1,21 @@
+﻿<Window x:Class="Chat.Windows.Client.ClientLoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:userControls="clr-namespace:Chat.UserControls"
+        mc:Ignorable="d"
+        Title="Login" Height="350" Width="500">
+    <Grid Margin="50">
+        <Grid.RowDefinitions>
+            <RowDefinition MaxHeight="60" />
+            <RowDefinition MaxHeight="30" />
+            <RowDefinition MaxHeight="30" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <userControls:AddressPortForm x:Name="ApfAddressPort" />
+        <Label Grid.Row="1" Margin="0 2 0 0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Username</Label>
+        <TextBox Grid.Row="2" Name="TxbUserName" Margin="5" TextAlignment="Center" Text="DefaultUser" />
+        <Button Grid.Row="3" Name="BtnLogin" Margin="5 30 5 0" Click="BtnLogin_OnClick">Login</Button>
+    </Grid>
+</Window>
