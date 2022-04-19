@@ -45,6 +45,10 @@ namespace Networking
             }
         }
 
+        /// <summary>
+        /// Closes given client and removes it from the client lsit
+        /// </summary>
+        /// <param name="client">Client to close</param>
         protected void CloseClient(Socket client)
         {
             Console.Log("Closing client connection...");
@@ -62,13 +66,27 @@ namespace Networking
             catch (Exception) { Console.LogWarning("Failed to close the clients handler!"); }
         }
 
+        /// <summary>
+        /// Send given byte array to all connected clients
+        /// </summary>
+        /// <param name="bytes">Byte array to send</param>
         protected async Task SendToConnectedClients(byte[] bytes)
         {
             foreach (Socket client in _clients) { await Send(client, bytes); }
         }
 
+        /// <summary>
+        /// Resolves given data
+        /// </summary>
+        /// <param name="client">Client that sent this data</param>
+        /// <param name="data">Byte array to resolve</param>
+        /// <param name="numBytesRead">Number of bytes read</param>
+        /// <returns>Task resolving in a boolean, true means the client will stay connected, false means it will not</returns>
         protected abstract Task<bool> ResolvePacket(Socket client, byte[] data, int numBytesRead);
 
+        /// <summary>
+        /// Handles accepting connections
+        /// </summary>
         private async Task AcceptHandler()
         {
             try
@@ -89,6 +107,10 @@ namespace Networking
             }
         }
 
+        /// <summary>
+        /// Handles receiving data
+        /// </summary>
+        /// <param name="client">Client that sent the data</param>
         private async Task ReceiveHandler(Socket client)
         {
             try
@@ -119,6 +141,11 @@ namespace Networking
             }
         }
 
+        /// <summary>
+        /// Send give byte array to given client
+        /// </summary>
+        /// <param name="client">Client to send data to</param>
+        /// <param name="bytes">Byte array to send to client</param>
         private static async Task Send(Socket client, byte[] bytes) { await client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None); }
     }
 }

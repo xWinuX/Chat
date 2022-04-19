@@ -50,6 +50,9 @@ namespace Chat.Windows.Client
             ScrvChat.AddText(textBlock);
         }
 
+        /// <summary>
+        /// Returns to login window and display message
+        /// </summary>
         public void ServerClosed()
         {
             _serverConnectionIsStable = false;
@@ -61,6 +64,7 @@ namespace Chat.Windows.Client
         {
             if (TxbMessage.Text == string.Empty) { return; } // Message shouldn't be empty 
 
+            // Try to send message, if it fails close this window and return to login
             try { await _client.SendMessage(_userName, TxbMessage.Text); }
             catch (Exception)
             {

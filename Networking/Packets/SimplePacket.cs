@@ -4,6 +4,11 @@ namespace Networking.Packets
 {
     public abstract class SimplePacket : Packet
     {
+        /// <summary>
+        /// Constructs a simple byte array with a type at the first byte and a message on the last ones
+        /// </summary>
+        /// <param name="data">String to add to the payload</param>
+        /// <returns></returns>
         protected byte[] ConstructPacket(string data)
         {
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);

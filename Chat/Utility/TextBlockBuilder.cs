@@ -9,18 +9,32 @@ namespace Chat.Utility
         private Brush  _color   = new SolidColorBrush(Colors.White);
         private string _message = string.Empty;
 
+        /// <summary>
+        /// Set text color
+        /// </summary>
+        /// <param name="color">Color to set</param>
+        /// <returns>self for chaining</returns>
         public TextBlockBuilder WithColor(Color color)
         {
             _color = new SolidColorBrush(color);
             return this;
         }
 
+        /// <summary>
+        /// Set message
+        /// </summary>
+        /// <param name="message">Message to set</param>
+        /// <returns>self for chaining</returns>
         public TextBlockBuilder WithMessage(string message)
         {
             _message = message;
             return this;
         }
 
+        /// <summary>
+        /// Build the text block
+        /// </summary>
+        /// <returns>The built text block</returns>
         public TextBlock Build()
         {
             TextBlock textBlock = new TextBlock

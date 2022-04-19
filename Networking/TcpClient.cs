@@ -28,7 +28,7 @@ namespace Networking
                 await _client.ConnectAsync(endpoint);
                 await SendAcceptPacket();
 
-                ReceiveHandler(_client);
+                ReceiveHandler();
             }
             catch (Exception)
             {
@@ -47,6 +47,10 @@ namespace Networking
             Close(_client);
         }
 
+        /// <summary>
+        /// Sends given packet to server
+        /// </summary>
+        /// <param name="packet">Packet to send</param>
         protected async Task Send(Packet packet)
         {
             if (_client == null) { return; }
@@ -56,15 +60,34 @@ namespace Networking
             await _client.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), SocketFlags.None);
         }
 
+        /// <summary>
+        /// Resolves given byte array and
+        /// </summary>
+        /// <param name="data">Byte array to resolve</param>
+        /// <param name="numBytesRead">Number of bytes read</param>
         protected abstract void ResolvePacket(byte[] data, int numBytesRead);
 
+        /// <summary>
+        /// Sends the closing packet, it signals the server that this client is about to disconnect
+        /// </summary>
+        /// <returns>Task that resolves into void</returns>
         protected abstract Task SendClosingPacket();
 
+        /// <summary>
+        /// Sends the accept packet
+        /// </summary>
+        /// <returns></returns>
         protected abstract Task SendAcceptPacket();
 
+        /// <summary>
+        /// This will happen if the receive fails (server probably unreachable)
+        /// </summary>
         protected abstract void OnReceiveFail();
 
-        private async Task ReceiveHandler(Socket client)
+        /// <summary>
+        /// Handles receiving data from server
+        /// </summary>
+        private async Task ReceiveHandler()
         {
             try
             {
@@ -72,7 +95,7 @@ namespace Networking
                 {
                     byte[]             bytes        = new byte[Packet.BufferSize];
                     ArraySegment<byte> arraySegment = new ArraySegment<byte>(bytes);
-                    int                numBytesRead = await client.ReceiveAsync(arraySegment, 0);
+                    int                numBytesRead = await _client.ReceiveAsync(arraySegment, 0);
                     byte[]             data         = arraySegment.ToArray();
 
                     ResolvePacket(data, numBytesRead);

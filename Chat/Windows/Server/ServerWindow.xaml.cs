@@ -24,19 +24,24 @@ namespace Chat.Windows.Server
         }
 
         public void Log(string message) { AppendToConsole(Builder.WithMessage(message).Build()); }
-
         public void LogSuccess(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Lime).Build()); }
-
         public void LogWarning(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Yellow).Build()); }
-
         public void LogError(string message) { AppendToConsole(Builder.WithMessage(message).WithColor(Colors.Red).Build()); }
 
+        /// <summary>
+        /// Adds timestamp to the front of the given text block
+        /// </summary>
+        /// <param name="textBlock">Text block to add timestamp to</param>
         private static void AddTimeToTextBlock(TextBlock textBlock)
         {
             string time = DateTime.Now.ToString("HH:mm:ss");
             textBlock.Text = "[" + time + "]" + " " + textBlock.Text;
         }
 
+        /// <summary>
+        /// Appends the given text block to the console
+        /// </summary>
+        /// <param name="textBlock">Text block to append</param>
         private void AppendToConsole(TextBlock textBlock)
         {
             AddTimeToTextBlock(textBlock);

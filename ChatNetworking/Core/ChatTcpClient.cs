@@ -17,6 +17,11 @@ namespace ChatNetworking.Core
             _chat     = chat;
         }
 
+        /// <summary>
+        /// Sends given message to server
+        /// </summary>
+        /// <param name="userName">Username that sends this message</param>
+        /// <param name="message">Message to send</param>
         public async Task SendMessage(string userName, string message) { await Send(new ClientMessageSentPacket(userName, message)); }
 
         protected override void ResolvePacket(byte[] data, int numBytesRead)
@@ -29,11 +34,11 @@ namespace ChatNetworking.Core
             {
                 case PacketType.ClientConnected:
                     ClientConnectedPacket clientConnectedPacket = PacketUtility.TryParse<ClientConnectedPacket>(data, numBytesRead);
-                    _chat.AddServerMessage($"{clientConnectedPacket.UserName} has joined the Server!");
+                    _chat.AddServerMessage($"{clientConnectedPacket.UserName} has joined the server!");
                     break;
                 case PacketType.ClientDisconnected:
                     ClientDisconnectedPacket clientDisconnectedPacket = PacketUtility.TryParse<ClientDisconnectedPacket>(data, numBytesRead);
-                    _chat.AddServerMessage($"{clientDisconnectedPacket.UserName} has left the Server!");
+                    _chat.AddServerMessage($"{clientDisconnectedPacket.UserName} has left the server!");
                     break;
                 case PacketType.ClientMessageSent:
                     ClientMessageSentPacket clientMessageSentPacketPacket = PacketUtility.TryParse<ClientMessageSentPacket>(data, numBytesRead);

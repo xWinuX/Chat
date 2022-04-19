@@ -13,6 +13,10 @@ namespace Networking
             Port    = port;
         }
 
+        /// <summary>
+        /// Closes given socket
+        /// </summary>
+        /// <param name="socket">Socket to close</param>
         protected static void Close(Socket socket)
         {
             try { socket.Shutdown(SocketShutdown.Both); }
