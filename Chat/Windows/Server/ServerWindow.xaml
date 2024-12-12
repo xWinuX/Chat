@@ -6,6 +6,7 @@
         xmlns:userControls="clr-namespace:Chat.UserControls"
         mc:Ignorable="d"
         Title="Server" Height="450" Width="500"
+        WindowStartupLocation="CenterScreen"
         Loaded="ServerWindow_OnLoaded">
     <Grid>
         <userControls:ScrollTextDisplay x:Name="ScrtConsole" Grid.Row="0" Margin="5" BorderThickness="5" Background="Black" />

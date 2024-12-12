@@ -6,6 +6,7 @@
         xmlns:userControls="clr-namespace:Chat.UserControls"
         mc:Ignorable="d"
         Title="Client" Height="450" Width="500"
+        WindowStartupLocation="CenterScreen"
         Closed="ClientWindow_OnClosed"
         Loaded="ClientWindow_OnLoaded">
     <Grid>
